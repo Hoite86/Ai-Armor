@@ -880,28 +880,6 @@ fn start_windows_clipboard_listener(app: tauri::AppHandle) {
 #[cfg(not(target_os = "windows"))]
 fn start_windows_clipboard_listener(_app: tauri::AppHandle) {}
 
-#[cfg(target_os = "linux")]
-fn start_linux_clipboard_listener(app: tauri::AppHandle) {
-    std::thread::spawn(move || {
-        use std::{thread, time::Duration as StdDuration};
-
-        let mut clipboard = match arboard::Clipboard::new() {
-            Ok(cb) => cb,
-            Err(_) => return,
-        };
-
-        loop {
-            if let Ok(text) = clipboard.get_text() {
-                maybe_emit_clipboard_toast(&app, &text);
-            }
-            thread::sleep(StdDuration::from_millis(700));
-        }
-    });
-}
-
-#[cfg(not(target_os = "linux"))]
-fn start_linux_clipboard_listener(_app: tauri::AppHandle) {}
-
 #[cfg(test)]
 mod runtime_tests {
     use super::*;

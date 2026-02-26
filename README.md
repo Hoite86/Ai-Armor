@@ -123,41 +123,41 @@ This gives strong practical isolation between sessions while keeping restore rel
 
 ### Prerequisites
 
-- Ubuntu 22.04+ (primary target for this branch)
+- Windows 10/11 (required for full clipboard listener behavior)
 - Rust stable toolchain (`rustup`, `cargo`)
-- Linux desktop with X11/Wayland clipboard support
-- Tauri v2 Linux prerequisites (webkit2gtk + build-essential + pkg-config + libssl-dev)
+- Tauri v2 Windows prerequisites (WebView2 + MSVC build tools)
 
-### Fast path (recommended on Ubuntu/Linux)
+### Fast path (recommended on Windows)
 
 From repo root:
 
-```bash
-./scripts/ubuntu-setup-and-build.sh
+```powershell
+./scripts/windows-setup-and-build.ps1
 ```
 
 What this does:
 1. Verifies `cargo` is installed.
 2. Runs `cargo fetch` so dependencies are downloaded locally.
 3. Runs core crate tests.
-4. Launches AI Armor for local testing on Linux.
+4. Launches AI Armor for local testing.
 
-### Build release binary (Ubuntu/Linux)
+### Build release binary (Windows)
 
-```bash
-RELEASE=1 ./scripts/ubuntu-setup-and-build.sh
+```powershell
+./scripts/windows-setup-and-build.ps1 -Release
 ```
 
 Output binary:
-- `apps/desktop-tauri/src-tauri/target/release/desktop-tauri`
+- `apps/desktop-tauri/src-tauri/target/release/desktop-tauri.exe`
 
-### Windows packaging (optional)
-
-For Windows installer workflows, use:
+### Build installer package (Windows)
 
 ```powershell
 ./scripts/windows-setup-and-build.ps1 -Installer
 ```
+
+This installs `tauri-cli` automatically if missing, then creates installer artifacts in:
+- `apps/desktop-tauri/src-tauri/target/release/bundle`
 
 ### Manual commands (if preferred)
 
@@ -169,46 +169,22 @@ cargo run
 ```
 
 
-### Ubuntu/Linux development branch
-
-This repository now has a dedicated branch for Ubuntu work: `ubuntu-version`.
-
-For Linux setup on that branch:
-
-```bash
-./scripts/ubuntu-setup-and-build.sh
-```
-
-Optional modes:
-- `SKIP_TESTS=1 ./scripts/ubuntu-setup-and-build.sh`
-- `RELEASE=1 ./scripts/ubuntu-setup-and-build.sh`
-
-Notes:
-- Linux support is active on this branch and suitable for local testing; desktop-environment behavior may still vary.
-- Core crates compile cross-platform, but clipboard/tray behavior may vary by desktop environment.
-
-
 ## Download and test on another machine
 
 1. Push this repository to Git.
 2. On the test machine, clone it.
-3. Open a terminal in repo root and run:
+3. Open PowerShell in repo root and run:
 
-```bash
-./scripts/ubuntu-setup-and-build.sh
+```powershell
+./scripts/windows-setup-and-build.ps1 -Installer
 ```
 
-4. Optionally build a Linux release binary with:
-
-```bash
-RELEASE=1 ./scripts/ubuntu-setup-and-build.sh
-```
+4. Install the generated package from `target/release/bundle`.
 
 This keeps setup reproducible and ensures dependencies are fetched during the build flow.
 
 ## Current limitations
 
-- Linux listener currently uses polling-based clipboard checks (700ms) with duplicate suppression and self-write cooldown safeguards.
-- Windows listener uses `WM_CLIPBOARDUPDATE` eventing and remains supported.
-- macOS support is marked TODO.
+- Windows listener uses `WM_CLIPBOARDUPDATE` with duplicate suppression and basic self-write cooldown safeguards.
+- macOS/Linux support is marked TODO.
 - AI Armor cannot stop manual typing into AI tools; it protects **copy/paste flows**.
