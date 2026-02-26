@@ -1,0 +1,41 @@
+[workspace]
+members = [
+  "crates/core-model",
+  "crates/core-detect",
+  "crates/core-tokenize",
+  "crates/core-crypto",
+  "crates/core-vault",
+  "apps/desktop-tauri/src-tauri",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["AI Armor"]
+
+[workspace.dependencies]
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde", "clock"] }
+once_cell = "1"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+sha2 = "0.10"
+base32 = "0.4"
+rusqlite = { version = "0.32", features = ["bundled-sqlcipher", "chrono"] }
+rand = "0.8"
+parking_lot = "0.12"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+windows = { version = "0.58", features = [
+  "Win32_Foundation",
+  "Win32_Security_Cryptography",
+  "Win32_System_DataExchange",
+  "Win32_System_Memory",
+  "Win32_System_Threading",
+  "Win32_UI_WindowsAndMessaging",
+] }

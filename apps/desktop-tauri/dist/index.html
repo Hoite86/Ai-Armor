@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Armor // Atomic Retro Console</title>
+  <style>
+    :root {
+      --bg:#0b0f14;
+      --panel:#121820;
+      --ink:#f8f4e8;
+      --mint:#9ed0ff;
+      --gold:#ffd85e;
+      --line:#2d4260;
+      --focus:#ffe788;
+    }
+    *{box-sizing:border-box}
+    body {
+      margin:0;
+      background: radial-gradient(circle at 20% 10%, #192130 0%, var(--bg) 45%) fixed;
+      color:var(--ink);
+      font-family: "Inter", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+      min-height:100vh;
+      padding:14px;
+    }
+    .shell {
+      width:min(960px, 100%);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    .panel {
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #18212b 0%, var(--panel) 100%);
+      box-shadow:0 10px 30px #00000050, inset 0 1px 0 #ffffff10;
+      border-radius:14px;
+      padding:12px;
+    }
+    .headline {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+      border-bottom:1px dashed #3e5368;
+      padding-bottom:8px;
+    }
+    .title {
+      margin:0;
+      font-size:18px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:700;
+      color:#9ed0ff;
+    }
+    .badge {
+      border:1px solid #41627e;
+      border-radius:999px;
+      padding:2px 10px;
+      font-size:11px;
+      color:#d6ecff;
+      background:#1b2733;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      white-space:nowrap;
+    }
+    .grid2 {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:6px 0; }
+    .stack { display:flex; flex-direction:column; gap:8px; }
+
+    label { font-size:13px; color:#d9e4ef; }
+    .hint { color:#b8c8d8; font-size:12px; line-height:1.35; }
+    .warn { color:var(--gold); font-size:14px; font-weight:700; line-height:1.5; }
+    .legal { color:#ffe9a7; font-size:12px; }
+
+    input,select,button,textarea {
+      width:100%;
+      border:1px solid #3d4f62;
+      background:#0f151d;
+      color:var(--ink);
+      border-radius:10px;
+      padding:9px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    input:focus,select:focus,button:focus,textarea:focus { border-color:var(--focus); box-shadow:0 0 0 3px #9ad1ff33; }
+    textarea { min-height:78px; resize:vertical; }
+
+    .btn {
+      cursor:pointer;
+      border:1px solid #41627e;
+      background:linear-gradient(180deg,#2a3e52,#223445);
+      color:#eef6ff;
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+    .btn.alt { background:linear-gradient(180deg,#27463e,#1e3732); border-color:#3d6d60; color:#dffff4; }
+    .btn.warn { background:linear-gradient(180deg,#5b3f2a,#402b1d); border-color:#7d5a3f; color:#ffe8ce; }
+
+    .inline { width:auto; }
+    .split { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; }
+
+    @media (max-width: 860px){
+      .grid2 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel" id="tosPanel">
+      <div class="headline">
+        <h1 class="title">AI Armor Terms of Service</h1>
+        <span class="badge">Local Only</span>
+      </div>
+      <div class="stack">
+        <p class="hint warn">
+          AI Armor is provided to assist in preserving sensitive information during copy/paste workflows.
+          You remain fully responsible for protecting your data, access controls, and endpoint security.
+        </p>
+        <p class="hint legal">
+          By continuing, you acknowledge and agree that this software is provided "AS IS" and for assistance purposes only.
+          AI Armor stores its mapping data on this host system, is <strong>not</strong> anti-malware software, and cannot guarantee prevention of all security incidents.
+          To the maximum extent permitted by law, you agree the developer is not liable for any direct or indirect losses, claims, or damages from data exposure, misuse, breach, or third-party compromise, and you waive claims including legal action related to such events.
+        </p>
+        <p class="hint">
+          If you do not agree, do not use the software.
+        </p>
+        <button class="btn alt" id="agreeBtn">I Agree and Continue</button>
+      </div>
+    </section>
+
+    <section class="panel" id="settingsPanel" style="display:none">
+      <div class="headline">
+        <h2 class="title">Rules & Settings</h2>
+        <span class="badge">Atomic Era + Modern</span>
+      </div>
+      <div class="grid2">
+        <div class="stack">
+          <label><input class="inline" type="checkbox" id="highRisk"> High-risk-only detection</label>
+          <div class="split">
+            <label for="ttl">Mapping TTL</label>
+            <select id="ttl" class="inline">
+              <option value="1">1 hour</option>
+              <option value="24">24 hours</option>
+              <option value="168">7 days</option>
+            </select>
+          </div>
+          <label><input class="inline" type="checkbox" id="toastOnly" checked> Offer toast only when sensitive content is detected</label>
+          <label for="terms">Sensitive values to always detect (one per line)</label>
+          <textarea id="terms" placeholder="ClientName\nProjectCodename\nInternal phrase"></textarea>
+
+          <label for="updateUrl">Manual update URL (future use)</label>
+          <input id="updateUrl" placeholder="https://your-site.example.com/ai-armor-updates" />
+          <p class="hint">Users can periodically visit this URL to manually download patches/features.</p>
+          
+          <label for="verifyFilePath">Verify downloaded update (optional)</label>
+          <input id="verifyFilePath" placeholder="C:\Downloads\AIArmorInstaller.exe" />
+          <input id="verifySha" placeholder="Expected SHA-256" />
+          <input id="verifySig" placeholder="Signature (base64)" />
+          <input id="verifyPub" placeholder="Public key (base64)" />
+          <button class="btn alt" id="verifyUpdateBtn">Verify update package</button>
+          <p class="hint" id="verifyUpdateResult">Verification not run yet.</p>
+          <button class="btn" id="saveSettings">Save local settings</button>
+        </div>
+
+        <div class="stack">
+          <p class="hint">
+            Privacy model: no accounts, no telemetry, no cloud sync. Processing is local to this host.
+          </p>
+          <p class="hint">
+            AI Armor helps reduce accidental exposure. It does not replace organizational security policy,
+            DLP controls, malware protection, or endpoint hardening.
+          </p>
+          <p class="hint warn">
+            Responsibility for preserving sensitive information remains with the user/operator.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="patternPanel" style="display:none">
+      <div class="headline">
+        <h2 class="title">Custom PII Builder</h2>
+        <span class="badge">Example → Pattern</span>
+      </div>
+      <div class="grid2">
+        <div class="stack">
+          <label for="pName">Field label</label>
+          <input id="pName" placeholder="e.g., Employee ID" />
+          <label for="pExample">Example value</label>
+          <input id="pExample" placeholder="e.g., EMP-123456" />
+          <label><input class="inline" type="checkbox" id="pBoundary" checked> Match on word boundaries</label>
+          <button class="btn" id="suggestBtn">Suggest pattern + run sample test</button>
+        </div>
+
+        <div class="stack">
+          <label for="suggestedRegex">Suggested regex</label>
+          <input id="suggestedRegex" readonly />
+          <div id="regexTest" class="hint">Pattern test pending.</div>
+          <button class="btn alt" id="savePattern">Save / update custom field</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="helpPanel" style="display:none">
+      <div class="headline">
+        <h2 class="title">Help Menu</h2>
+        <span class="badge">How to Use AI Armor</span>
+      </div>
+      <div class="grid2">
+        <div class="stack">
+          <p class="hint"><strong>1) Protect for AI:</strong> Copy text, review smart toast, click Protect for AI to replace sensitive values with reversible tokens.</p>
+          <p class="hint"><strong>2) Restore details:</strong> If clipboard contains AI Armor tokens, click Restore details to recover local values from encrypted vault.</p>
+          <p class="hint"><strong>3) Rules:</strong> Add sensitive terms under Rules & Settings for exact phrase matching (case-insensitive, boundary aware).</p>
+        </div>
+        <div class="stack">
+          <p class="hint"><strong>4) Example-to-rule:</strong> In Custom PII Builder, enter an example value, generate regex, run sample test, then save.</p>
+          <p class="hint"><strong>5) High-risk mode:</strong> Enables toasts only for top-risk classes (private keys, API keys, high-entropy tokens, cards, SSN, JWT/Bearer).</p>
+          <p class="hint"><strong>6) Safety controls:</strong> Pause detection from tray, ignore specific apps, use undo quickly, and purge mappings when needed.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const invoke = window.__TAURI__?.core?.invoke;
+
+    async function init() {
+      if (!invoke) return;
+      const tosAccepted = await invoke('get_tos_status');
+      if (tosAccepted) {
+        tosPanel.style.display = 'none';
+        settingsPanel.style.display = 'block';
+        patternPanel.style.display = 'block';
+        helpPanel.style.display = 'block';
+        await loadSettings();
+      }
+    }
+
+    async function loadSettings() {
+      const s = await invoke('get_settings');
+      highRisk.checked = !!s.high_risk_only;
+      ttl.value = String(s.ttl_hours || 24);
+      toastOnly.checked = !!s.offer_toast_only_when_sensitive;
+      terms.value = (s.sensitive_terms || []).join('\n');
+      updateUrl.value = s.update_portal_url || '';
+    }
+
+    agreeBtn.onclick = async () => {
+      await invoke('accept_tos');
+      tosPanel.style.display = 'none';
+      settingsPanel.style.display = 'block';
+      patternPanel.style.display = 'block';
+      helpPanel.style.display = 'block';
+      await loadSettings();
+    };
+
+    saveSettings.onclick = async () => {
+      const s = await invoke('get_settings');
+      s.high_risk_only = highRisk.checked;
+      s.ttl_hours = parseInt(ttl.value, 10);
+      s.offer_toast_only_when_sensitive = toastOnly.checked;
+      s.sensitive_terms = terms.value.split('\n').map(x => x.trim()).filter(Boolean);
+      s.update_portal_url = updateUrl.value.trim();
+      await invoke('save_settings', { settings: s });
+      alert('Settings saved locally.');
+    };
+
+    suggestBtn.onclick = async () => {
+      const out = await invoke('suggest_regex', {
+        input: { name: pName.value || 'custom', example: pExample.value, boundary: pBoundary.checked }
+      });
+      suggestedRegex.value = out.regex;
+      regexTest.textContent = out.passes_example
+        ? 'Sample test passed. You can save this custom field.'
+        : 'Sample test failed. Adjust the example and try again.';
+      regexTest.style.color = out.passes_example ? '#8ff0c8' : '#ffd38c';
+    };
+
+
+    verifyUpdateBtn.onclick = async () => {
+      const result = await invoke('verify_update_artifact', {
+        input: {
+          file_path: verifyFilePath.value,
+          expected_sha256: verifySha.value,
+          signature_b64: verifySig.value,
+          public_key_b64: verifyPub.value
+        }
+      }).catch(e => ({ error: String(e) }));
+
+      if (result.error) {
+        verifyUpdateResult.textContent = `Verification error: ${result.error}`;
+        verifyUpdateResult.style.color = '#ffd38c';
+        return;
+      }
+      const ok = result.hash_ok && result.signature_ok;
+      verifyUpdateResult.textContent = ok
+        ? 'Verification passed: checksum and signature are valid.'
+        : `Verification failed (hash_ok=${result.hash_ok}, signature_ok=${result.signature_ok}).`;
+      verifyUpdateResult.style.color = ok ? '#8ff0c8' : '#ffd38c';
+    };
+
+    savePattern.onclick = async () => {
+      await invoke('add_user_pattern', {
+        pattern: {
+          name: pName.value,
+          sample: pExample.value,
+          regex: suggestedRegex.value,
+          enabled: true,
+          word_boundary: pBoundary.checked
+        }
+      });
+      alert('Custom field saved.');
+    };
+
+    init();
+  </script>
+</body>
+</html>
