@@ -1,10 +1,10 @@
 # AI Armor (Desktop, local-first)
 
-AI Armor is a Windows-first desktop tray app that helps protect copy/paste workflows when using AI tools.
+AI Armor is an Ubuntu-focused desktop tray app (with Windows support) that helps protect copy/paste workflows when using AI tools.
 
 ## What it does
 
-- Watches clipboard text changes locally (Windows clipboard listener MVP).
+- Watches clipboard text changes locally (Linux polling listener on this branch, Windows event listener still supported).
 - Shows a smart toast when it detects:
   - sensitive data → **Protect for AI**
   - existing AI Armor tokens → **Restore details**
@@ -36,7 +36,7 @@ Rust workspace crates:
 - `core-tokenize`: reversible tokenization (`[[AA1:TYPE_01]]`) and restoration
 - `core-crypto`: DPAPI key wrapping helpers + hashing
 - `core-vault`: SQLCipher-backed encrypted session vault, TTL purge, restore matching
-- `apps/desktop-tauri/src-tauri`: tray application shell, commands, and Windows listener hook
+- `apps/desktop-tauri/src-tauri`: tray application shell, commands, Windows listener, and Linux polling listener
 
 ## Detection classes (MVP)
 

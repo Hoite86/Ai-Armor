@@ -140,6 +140,8 @@ fn main() {
             setup_tray(app)?;
             #[cfg(target_os = "windows")]
             start_windows_clipboard_listener(app.handle().clone());
+            #[cfg(target_os = "linux")]
+            start_linux_clipboard_listener(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
